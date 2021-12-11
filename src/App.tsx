@@ -5,21 +5,51 @@ import { Movie } from './types/Movie'
 const App = () => {
   let APiLink = 'https://api.b7web.com.br/cinema/';
 
-  const [movies, setMovies] = useState<Movie[]>([]);
+  const [loading, setLoadig] = useState(false);
 
-  useEffect(() => {
-    loadMovies()
-  }, [])
 
+  //Código Longo sem Async/await
   const loadMovies = () => {
     fetch(APiLink).then((response) => {
       return response.json();
     })
     .then((json) => {
       setMovies(json);
-    });
+    })
+    .catch((error)=>{
+      setLoadig(false)
+      setMovies([])
+      alert('Sorry for this... We found an error')
+      console.log(error)
+    })
   }
 
+
+  const [movies, setMovies] = useState<Movie[]>([]);
+
+  useEffect(() => {
+    loadMovies()
+  }, [])
+
+
+
+/*
+  //Código Simplificado usando Async/Await
+  const loadMovies = async () => {
+  try {
+    setLoadig(true);
+
+    let response = await fetch(APiLink);
+    let json = await response.json();
+
+    setLoadig(false);
+    setMovies(json);
+    } catch(e) {
+      setLoadig(false)
+      alert('Huh. We found and error, sorry for this.')
+    } 
+  }
+*/
 
   return <>
   <header className="flex justify-between items-center flex-wrap py-5 px-9 shadow-2xl">
@@ -27,7 +57,12 @@ const App = () => {
       <h3 className="font-bold text-2xl text-red-300 cursor-pointer">RequestJS</h3>
     </div>
     <div className="movieTotla">
+
+  {!loading &&
       <p>Movies total is: {movies.length}</p>
+  }
+  
+
     </div>
     <nav className="mt-2 hidden">
       <div className="menu uppercase">
@@ -41,24 +76,24 @@ const App = () => {
 
   <section className="">
   <div className="text-center my-9">
-    {/* <h1 className="antialised text-2xl uppercase tracking-wider"> API <button onClick={loadMovies} className="text-red-400 underline capitalize">to show</button> Movies</h1> */}
+      {loading && //It's mean that loading gonna appear when it be true
+      <h1 className="antialised text-2xl uppercase tracking-wider">Your page gonna appear soon; loading</h1>
+      }
   </div>
 
   <div className="grid grid-cols-1 px-5 gap-4 text-center mx-5 mb-5 sm:grid-cols-3 xl:grid-cols-4 xl:gap-5">
     
     {movies.map((item, index) => (
-
-//Margin: auto = m-auto
-
-<div className="box m-auto " key={index}>
-      <h1 className="mb-3 font-medium text-2xl md:text-lg"> {item.title} </h1>
+    //Margin: auto = m-auto
+    <div className="box m-auto " key={index}>
+      <p className=" font-medium text-2xl "> {item.title} </p>
 
       <div className="image">
-        <img src={item.avatar} className="w-200 object-cover" alt="{item.title}" />
+        <img src={item.avatar} className="w-200 object-cover cursor-pointer" alt="{item.title}" />
       </div>
 
     </div>
-    ))}
+  ))}
 
   </div>
   </section>
